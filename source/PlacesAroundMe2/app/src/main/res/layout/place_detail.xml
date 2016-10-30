@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:map="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFFFF"
+    android:paddingLeft="1dp"
+    android:paddingRight="1dp">
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:background="#FFFFFF00"
+        android:weightSum="1">
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/logo_new"
+            android:id="@+id/imageView"
+            android:scaleType="fitXY"
+            android:adjustViewBounds="true"
+            />
+
+        <TextView
+            android:text="Thông tin trạm xăng"
+            android:layout_height="match_parent"
+            android:id="@+id/textView"
+            android:layout_weight="1"
+            android:paddingLeft="6dp"
+            android:textSize="40px"
+            android:fontFamily="sans-serif"
+            android:textAlignment="center"
+            android:layout_width="210dp" />
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFFFF"
+        android:weightSum="1"
+        android:layout_marginTop="10dp">
+
+    </LinearLayout>
+
+</LinearLayout>
