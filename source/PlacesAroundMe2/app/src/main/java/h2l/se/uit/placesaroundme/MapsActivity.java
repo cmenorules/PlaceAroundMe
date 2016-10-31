@@ -90,8 +90,11 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
     private GoogleMap myMap;
     private ProgressDialog myProgress;
-
+    //x,y touch
     private LatLng latLng;
+
+    //x,y GPS
+    private LatLng latLngGPS;
     private Marker marker;
     Geocoder geocoder;
     private static final String MYTAG = "MYTAG";
@@ -335,11 +338,11 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
         if (myLocation != null) {
 
-            LatLng latLng = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
-            myMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
+             latLngGPS = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
+            myMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLngGPS, 13));
 
             CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(latLng)             // Sets the center of the map to location user
+                    .target(latLngGPS)             // Sets the center of the map to location user
                     .zoom(15)                   // Sets the zoom
                     .bearing(90)                // Sets the orientation of the camera to east
                     .tilt(40)                   // Sets the tilt of the camera to 30 degrees
@@ -350,7 +353,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             MarkerOptions option = new MarkerOptions();
             option.title("My Location");
             option.snippet("....");
-            option.position(latLng);
+            option.position(latLngGPS);
             Marker currentMarker = myMap.addMarker(option);
             currentMarker.showInfoWindow();
         } else {
@@ -364,7 +367,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
     @Override
     public void onLocationChanged(Location location) {
-
+        latLngGPS = new LatLng(location.getLatitude(),location.getLongitude());
     }
 
     @Override
