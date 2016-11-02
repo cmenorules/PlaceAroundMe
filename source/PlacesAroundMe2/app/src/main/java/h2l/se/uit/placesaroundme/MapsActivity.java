@@ -46,8 +46,8 @@ package h2l.se.uit.placesaroundme;
 //        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 //    }
 //}
+import android.content.Context;
 import android.Manifest;
-
 import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
@@ -55,6 +55,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -62,8 +63,12 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
-
+import android.net.ConnectivityManager;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
@@ -78,12 +83,17 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-
+import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import org.json.JSONArray;
+import org.json.JSONException;
 
 
 public class MapsActivity extends AppCompatActivity implements LocationListener {
@@ -119,15 +129,10 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         myProgress.setTitle("Map Loading ...");
         myProgress.setMessage("Please wait...");
         myProgress.setCancelable(true);
-
         // Hiển thị Progress Bar
         myProgress.show();
-
-
         SupportMapFragment mapFragment
                 = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-
-
         // Sét đặt sự kiện thời điểm GoogleMap đã sẵn sàng.
         mapFragment.getMapAsync(new OnMapReadyCallback() {
 
@@ -136,13 +141,9 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                 onMyMapReady(googleMap);
             }
         });
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new com.google.android.gms.common.api.GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
 
-
-
+        init();
     }
 
     private void onMyMapReady(GoogleMap googleMap) {
@@ -167,6 +168,16 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         myMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         myMap.getUiSettings().setZoomControlsEnabled(true);
         myMap.getUiSettings().setMapToolbarEnabled(true);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         myMap.setMyLocationEnabled(true);
 
         if(myMap!=null)
@@ -299,6 +310,29 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         return bestProvider;
     }
 
+    private AutoCompleteTextView txt_place = null;
+    private void init()
+    {
+        txt_place = (AutoCompleteTextView)findViewById(R.id.txt_place);
+        String[] places = new String[]{"Atm","Bus station","Hotel","Bar","Parking","Pharmacy ","School","Bank","Coffee","Restaurant","Shop","Company","Park","Market","Supper market"};
+
+
+        ArrayAdapter adapter = new ArrayAdapter(this,android.R.layout.simple_dropdown_item_1line,places);
+
+        txt_place.setAdapter(adapter);
+        txt_place.setThreshold(1);
+        txt_place.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if(latLngGPS != null && IsConnected())
+                {
+                     getLocations(latLngGPS.latitude,latLngGPS.longitude,"atm");
+                }
+            }
+        });
+
+    }
+
     // Chỉ gọi phương thức này khi đã có quyền xem vị trí người dùng.
     private void showMyLocation() {
 
@@ -365,6 +399,55 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     }
 
 
+    private String api = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=10.762622,106.660172&key=AIzaSyDLNooeVehb28bYKVglMDjzxCSsGfp1GEE&components=country:vn&radius=10000&type=";
+    public ArrayList<Position> getLocations(double lat, double lng, String type)
+    {
+        ArrayList<Position> locations = new ArrayList<Position>();
+        StringBuilder sb = new StringBuilder(api.replace("{ll}",lat+","+lng) + type);
+        HttpURLConnection conn = null;
+        StringBuilder jsonResults = new StringBuilder();
+        try {
+            URL url = new URL(sb.toString());
+            conn = (HttpURLConnection) url.openConnection();
+            InputStreamReader in = new InputStreamReader(conn.getInputStream());
+            // Load the results into a StringBuilder
+            int read;
+            char[] buff = new char[1024];
+            while ((read = in.read(buff)) != -1) {
+                jsonResults.append(buff, 0, read);
+            }
+        } catch (MalformedURLException e) {
+            return null;
+        } catch (IOException e) {
+            return null;
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+        try {
+            JSONObject JObj= new JSONObject(jsonResults.toString());
+            JSONArray places= JObj.getJSONArray("results");
+            int len= places.length();
+            //len = len > 15 ? 15 : len;
+            for(int i=0;i<len;i++)
+            {
+                JSONObject jobj= places.getJSONObject(i);
+                Position ln= new Position();
+                JSONObject jlocation = jobj.getJSONObject("geometry").getJSONObject("location");
+                ln._lat=(float) jlocation.getDouble("lat");
+                ln._long= (float) jlocation.getDouble("lng");
+                ln._name = jobj.getString("name");
+                ln._address = jobj.getString("vicinity");
+                locations.add(ln);
+            }
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return locations;
+    }
+
     @Override
     public void onLocationChanged(Location location) {
         latLngGPS = new LatLng(location.getLatitude(),location.getLongitude());
@@ -378,6 +461,20 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     @Override
     public void onProviderEnabled(String provider) {
 
+    }
+
+    public boolean IsConnected() {
+        ConnectivityManager connectivity = (ConnectivityManager)this.getApplicationContext()
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivity != null) {
+            NetworkInfo[] info = connectivity.getAllNetworkInfo();
+            if (info != null)
+                for (int i = 0; i < info.length; i++)
+                    if (info[i].getState() == NetworkInfo.State.CONNECTED) {
+                        return true;
+                    }
+        }
+        return false;
     }
 
     @Override
