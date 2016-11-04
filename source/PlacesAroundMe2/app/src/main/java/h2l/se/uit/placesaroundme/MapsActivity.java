@@ -49,12 +49,15 @@ package h2l.se.uit.placesaroundme;
 import android.Manifest;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -79,7 +82,15 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -107,6 +118,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     private Marker marker;
     Geocoder geocoder;
 
+    private com.google.android.gms.common.api.GoogleApiClient client;
 
 
     @Override
@@ -351,9 +363,59 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     }
 
 
+
+    private String api = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=10.762622,106.660172&key=AIzaSyDLNooeVehb28bYKVglMDjzxCSsGfp1GEE&components=country:vn&radius=10000&type=";
+    public ArrayList<Position> getLocations(double lat, double lng, String type)
+    {
+        ArrayList<Position> locations = new ArrayList<Position>();
+        StringBuilder sb = new StringBuilder(api.replace("{ll}",lat+","+lng) + type);
+        HttpURLConnection conn = null;
+        StringBuilder jsonResults = new StringBuilder();
+        try {
+            URL url = new URL(sb.toString());
+            conn = (HttpURLConnection) url.openConnection();
+            InputStreamReader in = new InputStreamReader(conn.getInputStream());
+            // Load the results into a StringBuilder
+            int read;
+            char[] buff = new char[1024];
+            while ((read = in.read(buff)) != -1) {
+                jsonResults.append(buff, 0, read);
+            }
+        } catch (MalformedURLException e) {
+            return null;
+        } catch (IOException e) {
+            return null;
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+        try {
+            JSONObject JObj= new JSONObject(jsonResults.toString());
+            JSONArray places= JObj.getJSONArray("results");
+            int len= places.length();
+            //len = len > 15 ? 15 : len;
+            for(int i=0;i<len;i++)
+            {
+                JSONObject jobj= places.getJSONObject(i);
+                Position ln= new Position();
+                JSONObject jlocation = jobj.getJSONObject("geometry").getJSONObject("location");
+                ln._lat=(float) jlocation.getDouble("lat");
+                ln._long= (float) jlocation.getDouble("lng");
+                ln._name = jobj.getString("name");
+                ln._address = jobj.getString("vicinity");
+                locations.add(ln);
+            }
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return locations;
+    }
+
     @Override
     public void onLocationChanged(Location location) {
-
+        latLngGPS = new LatLng(location.getLatitude(),location.getLongitude());
     }
 
     @Override
@@ -366,8 +428,58 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
     }
 
+    public boolean IsConnected() {
+        ConnectivityManager connectivity = (ConnectivityManager)this.getApplicationContext()
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivity != null) {
+            NetworkInfo[] info = connectivity.getAllNetworkInfo();
+            if (info != null)
+                for (int i = 0; i < info.length; i++)
+                    if (info[i].getState() == NetworkInfo.State.CONNECTED) {
+                        return true;
+                    }
+        }
+        return false;
+    }
+
     @Override
     public void onProviderDisabled(String provider) {
 
+    }
+
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    public Action getIndexApiAction() {
+        Thing object = new Thing.Builder()
+                .setName("Main Page") // TODO: Define a title for the content shown.
+                // TODO: Make sure this auto-generated URL is correct.
+                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
+                .build();
+        return new Action.Builder(Action.TYPE_VIEW)
+                .setObject(object)
+                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
+                .build();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        AppIndex.AppIndexApi.start(client, getIndexApiAction());
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        AppIndex.AppIndexApi.end(client, getIndexApiAction());
+        client.disconnect();
     }
 }
