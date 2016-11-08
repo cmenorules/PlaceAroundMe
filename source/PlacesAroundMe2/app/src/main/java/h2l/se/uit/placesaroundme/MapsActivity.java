@@ -349,17 +349,16 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                 if (latLngGPS != null && IsConnected()) {
                     //;
 
-                    AlertDialog alertDialog = new AlertDialog.Builder(MapsActivity.this).create();
-                    alertDialog.setTitle("Alert");
-                    alertDialog.setMessage(adapter.getItem(position).toString().replace(" ","_").toLowerCase());
-                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            });
-                    alertDialog.show();
-
+//                    AlertDialog alertDialog = new AlertDialog.Builder(MapsActivity.this).create();
+//                    alertDialog.setTitle("Alert");
+//                    alertDialog.setMessage(adapter.getItem(position).toString().replace(" ","_").toLowerCase());
+//                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+//                            new DialogInterface.OnClickListener() {
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    dialog.dismiss();
+//                                }
+//                            });
+//                    alertDialog.show();
                     AsynThreadTask task = new AsynThreadTask(latLngGPS.latitude, latLngGPS.longitude, adapter.getItem(position).toString().replace(" ","_").toLowerCase());
                     try {
                         task.execute().get();
