@@ -1,55 +1,11 @@
 package h2l.se.uit.placesaroundme;
 
-//import android.support.v4.app.FragmentActivity;
-//import android.os.Bundle;
-//
-//import com.google.android.gms.maps.CameraUpdateFactory;
-//import com.google.android.gms.maps.GoogleMap;
-//import com.google.android.gms.maps.OnMapReadyCallback;
-//import com.google.android.gms.maps.SupportMapFragment;
-//import com.google.android.gms.maps.model.LatLng;
-//import com.google.android.gms.maps.model.MarkerOptions;
-//
-//public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
-//
-//    private GoogleMap mMap;
-//
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_maps);
-//        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-//        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-//                .findFragmentById(R.id.map);
-//        mapFragment.getMapAsync(this);
-//    }
-//
-//
-//    /**
-//     * Manipulates the map once available.
-//     * This callback is triggered when the map is ready to be used.
-//     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-//     * we just add a marker near Sydney, Australia.
-//     * If Google Play services is not installed on the device, the user will be prompted to install
-//     * it inside the SupportMapFragment. This method will only be triggered once the user has
-//     * installed Google Play services and returned to the app.
-//     */
-//    @Override
-//    public void onMapReady(GoogleMap googleMap) {
-//        mMap = googleMap;
-//        mMap.setMinZoomPreference(12);
-//        mMap.setMaxZoomPreference(30);
-//
-//        // Add a marker in Sydney and move the camera
-//        LatLng sydney = new LatLng(10.762622, 	106.660172);
-//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-//    }
-//}
 import android.Manifest;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -65,6 +21,10 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
@@ -94,7 +54,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-
+import java.util.concurrent.ExecutionException;
 
 
 public class MapsActivity extends AppCompatActivity implements LocationListener {
@@ -112,7 +72,6 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
     //x,y GPS
     private LatLng latLngGPS;
-
 
 
     private Marker marker;
@@ -149,6 +108,9 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             }
         });
 
+
+        client = new com.google.android.gms.common.api.GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+        init();
     }
 
     private void onMyMapReady(GoogleMap googleMap) {
@@ -173,8 +135,18 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         myMap.getUiSettings().setZoomControlsEnabled(true);
         myMap.setMyLocationEnabled(true);
 
-        if(myMap!=null)
-        {
+
+        if (myMap != null) {
+            myMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
+
+                @Override
+                public void onMyLocationChange(Location arg0) {
+                    // TODO Auto-generated method stub
+
+                    latLngGPS = new LatLng(arg0.getLatitude(), arg0.getLongitude());
+                    myMap.addMarker(new MarkerOptions().position(new LatLng(arg0.getLatitude(), arg0.getLongitude())).title("It's Me!"));
+                }
+            });
             myMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
 
                 @Override
@@ -184,7 +156,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
                     List<android.location.Address> addresses = new ArrayList<>();
                     try {
-                        addresses = geocoder.getFromLocation(point.latitude, point.longitude,1);
+                        addresses = geocoder.getFromLocation(point.latitude, point.longitude, 1);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -193,7 +165,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
                     if (address != null) {
                         StringBuilder sb = new StringBuilder();
-                        for (int i = 0; i < address.getMaxAddressLineIndex(); i++){
+                        for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
                             sb.append(address.getAddressLine(i) + "\n");
                         }
                         Toast.makeText(MapsActivity.this, sb.toString(), Toast.LENGTH_LONG).show();
@@ -241,7 +213,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         }
 
         // Hiển thị vị trí hiện thời trên bản đồ.
-        this.showMyLocation();
+        //this.showMyLocation();
     }
 
 
@@ -335,8 +307,8 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         }
 
         if (myLocation != null) {
-
-             latLngGPS = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
+            myMap.clear();
+            latLngGPS = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
             myMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLngGPS, 13));
 
             CameraPosition cameraPosition = new CameraPosition.Builder()
@@ -362,60 +334,83 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
     }
 
+    private AutoCompleteTextView txt_place = null;
+
+    private void init() {
+        txt_place = (AutoCompleteTextView) findViewById(R.id.txt_place);
+
+        final ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, PlaceCD.places);
+        txt_place.setAdapter(adapter);
+        txt_place.setThreshold(1);
+        txt_place.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (latLngGPS != null && IsConnected()) {
+                    //;
+
+                    AlertDialog alertDialog = new AlertDialog.Builder(MapsActivity.this).create();
+                    alertDialog.setTitle("Alert");
+                    alertDialog.setMessage(adapter.getItem(position).toString().replace(" ","_").toLowerCase());
+                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    alertDialog.show();
+
+                    AsynThreadTask task = new AsynThreadTask(latLngGPS.latitude, latLngGPS.longitude, adapter.getItem(position).toString().replace(" ","_").toLowerCase());
+                    try {
+                        task.execute().get();
+                        ArrayList<Position> poss = task.getRs();
+                        myMap.clear();
+                        int count = 0;
+                        for (Position i : poss) {
+                            LatLng latL = new LatLng(i._lat, i._long);
+                            MarkerOptions option = new MarkerOptions();
+                            option.title(i._name + ". " + i._address);
+                            option.snippet("....");
+                            option.position(latL);
+                            Marker currentMarker = myMap.addMarker(option);
+                            currentMarker.showInfoWindow();
+                            count += 1;
+                            if(count > 10)
+                            {
+                                break;
+                            }
+                        }
+
+                        if (poss.size() > 0) {
+                            CameraPosition cameraPosition = new CameraPosition.Builder()
+                                    .target(latLngGPS)             // Sets the center of the map to location user
+                                    .zoom(13)                   // Sets the zoom
+                                    .bearing(90)                // Sets the orientation of the camera to east
+                                    .tilt(40)                   // Sets the tilt of the camera to 30 degrees
+                                    .build();                   // Creates a CameraPosition from the builder
+                            myMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                        }
 
 
-    private String api = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=10.762622,106.660172&key=AIzaSyDLNooeVehb28bYKVglMDjzxCSsGfp1GEE&components=country:vn&radius=10000&type=";
-    public ArrayList<Position> getLocations(double lat, double lng, String type)
-    {
-        ArrayList<Position> locations = new ArrayList<Position>();
-        StringBuilder sb = new StringBuilder(api.replace("{ll}",lat+","+lng) + type);
-        HttpURLConnection conn = null;
-        StringBuilder jsonResults = new StringBuilder();
-        try {
-            URL url = new URL(sb.toString());
-            conn = (HttpURLConnection) url.openConnection();
-            InputStreamReader in = new InputStreamReader(conn.getInputStream());
-            // Load the results into a StringBuilder
-            int read;
-            char[] buff = new char[1024];
-            while ((read = in.read(buff)) != -1) {
-                jsonResults.append(buff, 0, read);
+                    } catch (InterruptedException e) {
+
+                    } catch (ExecutionException e) {
+                    }
+                    //getLocations(latLngGPS.latitude, latLngGPS.longitude, "atm");
+                }
             }
-        } catch (MalformedURLException e) {
-            return null;
-        } catch (IOException e) {
-            return null;
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
-            }
-        }
-        try {
-            JSONObject JObj= new JSONObject(jsonResults.toString());
-            JSONArray places= JObj.getJSONArray("results");
-            int len= places.length();
-            //len = len > 15 ? 15 : len;
-            for(int i=0;i<len;i++)
-            {
-                JSONObject jobj= places.getJSONObject(i);
-                Position ln= new Position();
-                JSONObject jlocation = jobj.getJSONObject("geometry").getJSONObject("location");
-                ln._lat=(float) jlocation.getDouble("lat");
-                ln._long= (float) jlocation.getDouble("lng");
-                ln._name = jobj.getString("name");
-                ln._address = jobj.getString("vicinity");
-                locations.add(ln);
-            }
-        } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return locations;
+        });
+
+    }
+
+
+    private void selectAnItem() {
+
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        latLngGPS = new LatLng(location.getLatitude(),location.getLongitude());
+        latLngGPS = new LatLng(location.getLatitude(), location.getLongitude());
     }
 
     @Override
@@ -429,7 +424,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     }
 
     public boolean IsConnected() {
-        ConnectivityManager connectivity = (ConnectivityManager)this.getApplicationContext()
+        ConnectivityManager connectivity = (ConnectivityManager) this.getApplicationContext()
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivity != null) {
             NetworkInfo[] info = connectivity.getAllNetworkInfo();
