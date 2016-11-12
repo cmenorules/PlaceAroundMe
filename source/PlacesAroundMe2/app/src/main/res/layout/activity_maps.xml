@@ -48,7 +48,7 @@
         <ImageButton
             android:layout_width="40dp"
             android:layout_height="match_parent"
-            android:src="@drawable/search"
+            android:src="@drawable/list"
             android:id="@+id/imageButton"
             android:scaleType="fitXY"
             android:adjustViewBounds="true"
