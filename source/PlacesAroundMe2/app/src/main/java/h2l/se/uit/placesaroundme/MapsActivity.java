@@ -7,6 +7,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
@@ -15,6 +16,7 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -41,10 +43,12 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Document;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -111,6 +115,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
         client = new com.google.android.gms.common.api.GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
         init();
+
     }
 
     private void onMyMapReady(GoogleMap googleMap) {
@@ -133,6 +138,8 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         });
         myMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         myMap.getUiSettings().setZoomControlsEnabled(true);
+
+        //not the error, you can build normally
         myMap.setMyLocationEnabled(true);
 
 
@@ -180,9 +187,11 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                     marker = myMap.addMarker(new MarkerOptions().position(point).title("Marker")
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)));
 
+                    veduongdi();
                 }
             });
         }
+
     }
 
 
@@ -476,4 +485,50 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         AppIndex.AppIndexApi.end(client, getIndexApiAction());
         client.disconnect();
     }
+
+    class veduongdixml extends AsyncTask<Double, Void, Void>
+    {
+        ArrayList<LatLng> mangtoado;
+        @Override
+        protected Void doInBackground(Double... params) {
+            // TODO Auto-generated method stub
+            //Log.d("json", params[0]+","+params[1]+"..."+params[2]+","+params[3]);
+            Direction md = new Direction();
+            LatLng x=new LatLng(params[0], params[1]);
+            LatLng y=new LatLng(params[2],params[3]);
+            Document doc = md.getDocument(x, y, Direction.MODE_DRIVING);
+            mangtoado = md.getDirection(doc);
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void result) {
+            // TODO Auto-generated method stub
+            super.onPostExecute(result);
+            PolylineOptions rectLine = new PolylineOptions().width(3).color(Color.RED); // Màu và độrộng
+
+            for(int i = 0 ; i <mangtoado.size() ; i++) {
+                rectLine.add(mangtoado.get(i));
+            }
+            myMap.addPolyline(rectLine);
+        }
+
+    }
+
+    public void veduongdi()
+    {
+        Toast.makeText(MapsActivity.this, "nhan nut",Toast.LENGTH_SHORT).show();
+        veduongdixml a=new veduongdixml();
+        a.execute(latLng.latitude,
+                latLng.longitude,
+                latLngGPS.latitude,
+                latLngGPS.longitude);
+
+    }
+
+//    private LatLng latLng;
+//
+//    //x,y GPS
+//    private LatLng latLngGPS;
+//    Marker mym;
+//    Marker marker_b;
 }
