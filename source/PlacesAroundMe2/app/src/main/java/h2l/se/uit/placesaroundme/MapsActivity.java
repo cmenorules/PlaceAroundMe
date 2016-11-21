@@ -177,6 +177,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                         }
                         Toast.makeText(MapsActivity.this, sb.toString(), Toast.LENGTH_LONG).show();
                     }
+                    veduongdi();
 
                     //remove previously placed Marker
                     if (marker != null) {
@@ -187,7 +188,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                     marker = myMap.addMarker(new MarkerOptions().position(point).title("Marker")
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)));
 
-                    veduongdi();
+
                 }
             });
         }
