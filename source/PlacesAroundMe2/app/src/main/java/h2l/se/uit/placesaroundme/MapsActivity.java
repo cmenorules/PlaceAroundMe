@@ -1,11 +1,8 @@
 package h2l.se.uit.placesaroundme;
 
 import android.Manifest;
-
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Criteria;
@@ -32,10 +29,8 @@ import android.widget.Toast;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
-
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -45,20 +40,15 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.w3c.dom.Document;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
+
+import h2l.se.uit.placesaroundme.dialogs.DetailsMarker;
 
 
 public class MapsActivity extends AppCompatActivity implements LocationListener {
@@ -523,13 +513,55 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                 latLng.longitude,
                 latLngGPS.latitude,
                 latLngGPS.longitude);
-
     }
 
-//    private LatLng latLng;
+//    void ItemClick(String position){
+//        LatLng sydney = new LatLng(10.762622,106.660172);
+//        mym=myMap.addMarker(new MarkerOptions().position(sydney).title(position));
+//        markers.add(mym);
+//        myMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+//        myMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+//            @Override
+//            public void onMapLongClick(LatLng arg0) {
+//                // TODO Auto-generated method stub
+//                marker_b = mMap.addMarker(
+//                        new MarkerOptions()
+//                                .position(arg0)
+//                                .title("my position")
+//                                .snippet("tui dang di bui o day")
+//                                .icon(BitmapDescriptorFactory.defaultMarker(
+//                                        BitmapDescriptorFactory.HUE_ROSE)));
+//                myMap.animateCamera(CameraUpdateFactory.newLatLngZoom(arg0, 15));
+//                markers.add(marker_b);
 //
-//    //x,y GPS
-//    private LatLng latLngGPS;
-//    Marker mym;
-//    Marker marker_b;
+//            }
+//        });
+//        myMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+//            @Override
+//            public boolean onMarkerClick(Marker arg0) {
+//                // TODO Auto-generated method stub
+//                return false;
+//            }
+//        });
+//        myMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+//
+//            @Override
+//            public void onInfoWindowClick(Marker arg0) {
+//                // TODO Auto-generated method stub
+//                marker_b=arg0; //gantruocde can thiveduongdi
+//                DetailsMarker detailsMarker = DetailsMarker_.newInstance(new DetailsMarker.CallBackRaw() {//goi interface ben dialog
+//                    @Override
+//                    public void finish() {
+//                        veduongdi();
+//                    }
+//                });
+//                detailsMarker.show(getSupportFragmentManager(), "showDetailsMarker");
+//            }
+//        });
+//
+//    }
+
+    private ArrayList<Marker> markers=new ArrayList<Marker>();
+    Marker mym;
+    Marker marker_b;
 }
