@@ -21,19 +21,6 @@
             android:adjustViewBounds="true"
             />
 
-        <!--<EditText-->
-            <!--android:layout_width="200dp"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:textColor="#404040"-->
-            <!--android:textStyle="normal"-->
-            <!--android:textSize="25px"-->
-            <!--android:paddingLeft="6dp"-->
-
-            <!--android:id="@+id/editText"-->
-            <!--android:background="@android:color/transparent"-->
-            <!--android:inputType="textPersonName"-->
-            <!--android:ems="10"-->
-            <!--android:hint="Places as market, bus,.."/>-->
         <AutoCompleteTextView
             android:layout_width="200dp"
             android:textColor="#000000"
@@ -59,6 +46,9 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+
+
         <fragment
             android:id="@+id/map"
             android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -66,6 +56,21 @@
             android:layout_height="match_parent"
             tools:context="h2l.se.uit.placesaroundme.MapsActivity" />
 
+        <TextView
+            android:text="Your location: Unknown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/txt_city"
+            android:textSize="20dp"
+            android:layout_marginLeft="18dp"
+            android:layout_marginStart="18dp"
+            android:layout_marginBottom="11dp"
+            android:textStyle="normal|bold"
+            android:textColor="@color/wallet_bright_foreground_holo_light"
+
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
     </RelativeLayout>
 
 </LinearLayout>

@@ -34,7 +34,7 @@ public class AsynThreadTask extends AsyncTask<Void, Void,Void> {
     private String category = "";
     private double lat = 0;
     private double lng = 0;
-    private String api = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=10.762622,106.660172&key=AIzaSyDLNooeVehb28bYKVglMDjzxCSsGfp1GEE&components=country:vn&radius=10000&type=";
+    private String api = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={ll}&key=AIzaSyDLNooeVehb28bYKVglMDjzxCSsGfp1GEE&components=country:vn&radius=10000&type=";
     public ArrayList<Position> getLocations(double lat, double lng, String type) {
 
         ArrayList<Position> locations = new ArrayList<Position>();
@@ -92,3 +92,5 @@ public class AsynThreadTask extends AsyncTask<Void, Void,Void> {
         return  null;
     }
 }
+
+
