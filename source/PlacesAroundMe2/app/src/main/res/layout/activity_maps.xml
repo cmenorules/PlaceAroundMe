@@ -57,20 +57,17 @@
             tools:context="h2l.se.uit.placesaroundme.MapsActivity" />
 
         <TextView
-            android:text="Your location: Unknown"
+            android:text="Searching..."
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/txt_city"
             android:textSize="20dp"
-            android:layout_marginLeft="18dp"
-            android:layout_marginStart="18dp"
-            android:layout_marginBottom="11dp"
-            android:textStyle="normal|bold"
-            android:textColor="@color/wallet_bright_foreground_holo_light"
-
+            android:textStyle="bold"
+            tools:background="@color/wallet_hint_foreground_holo_dark"
+            android:textColor="@color/common_google_signin_btn_text_light_pressed"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
     </RelativeLayout>
 
 </LinearLayout>

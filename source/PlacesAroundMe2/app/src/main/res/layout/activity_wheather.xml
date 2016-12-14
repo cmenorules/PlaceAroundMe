@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:map="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFFFF">
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:paddingRight="3dp"
+        android:background="#FFFFFFFF"
+        android:weightSum="1">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/back"
+            android:id="@+id/img_back"
+            android:adjustViewBounds="true"
+            />
+
+        <AutoCompleteTextView
+            android:layout_width="200dp"
+            android:textColor="#000000"
+            android:textStyle="normal"
+            android:background="@android:color/transparent"
+            android:textSize="25px"
+            android:layout_height="match_parent"
+            android:ems="10"
+            android:paddingLeft="6dp"
+            android:hint="Places as market, bus,.."
+            android:id="@+id/txt_place" />
+        <ImageButton
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/list"
+            android:id="@+id/imageButton"
+            android:scaleType="fitXY"
+            android:adjustViewBounds="true"
+            android:background="@android:color/transparent"
+            />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <TextView
+            android:text="Ho Chi Minh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/txt_city"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            tools:background="@color/wallet_hint_foreground_holo_dark"
+            android:textColor="@color/common_google_signin_btn_text_light_pressed"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/wallet_bright_foreground_holo_dark"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true">
+
+            <TextView
+                android:text="Wheather forcast today"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/txt_www"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:fontFamily="sans-serif"
+                android:textSize="40sp"
+                android:textColor="@color/colorPrimaryDark"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:gravity="center"/>
+
+            <TextView
+                android:text="Humidity:"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/txt_humidity"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:fontFamily="sans-serif"
+                android:textSize="23sp"
+                android:textColor="@color/colorPrimaryDark"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp" />
+            <TextView
+                android:text="Temperature:"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/txt_temperture"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:fontFamily="sans-serif"
+                android:textSize="23sp"
+                android:textColor="@color/colorPrimaryDark"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp" />
+
+
+            <TextView
+                android:text="Wind:"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/txt_wind"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:fontFamily="sans-serif"
+                android:textSize="23sp"
+                android:textColor="@color/colorPrimaryDark"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp" />
+
+            <TextView
+                android:text="Description:"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/txt_description"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:fontFamily="sans-serif"
+                android:textSize="23sp"
+                android:textColor="@color/colorPrimaryDark"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp" />
+
+            <TextView
+                android:text="Min temp:"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/txt_temperture_min"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:fontFamily="sans-serif"
+                android:textSize="23sp"
+                android:textColor="@color/colorPrimaryDark"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp" />
+
+            <TextView
+                android:text="Max temp:"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/txt_temperture_max"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:fontFamily="sans-serif"
+                android:textSize="23sp"
+                android:textColor="@color/colorPrimaryDark"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp" />
+
+            <TextView
+                android:text="Tips: Take your umbrella"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/txt_advice"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:fontFamily="sans-serif"
+                android:textSize="23sp"
+                android:textColor="@color/colorPrimaryDark"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp" />
+        </LinearLayout>
+    </RelativeLayout>
+
+</LinearLayout>

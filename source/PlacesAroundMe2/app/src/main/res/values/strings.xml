@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">PlacesAroundMe</string>
     <string name="title_activity_maps">Places Around Me</string>
+
+    <string name="title_activity_wheather">WheatherActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>

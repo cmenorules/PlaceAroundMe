@@ -3,8 +3,10 @@ package h2l.se.uit.placesaroundme;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -26,6 +28,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -76,22 +79,67 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     private Marker marker;
     Geocoder geocoder;
     private Handler hd_timer;
-    CheckWeatherForcastRunable checkWeatherTask;
-    private class CheckWeatherForcastRunable implements Runnable{
+    private CheckWeatherForcastRunable checkWeatherTask;
+    private ImageView imageView;
 
+    private class CheckWeatherForcastRunable implements Runnable {
         @Override
         public void run() {
-            CheckWeatherForcast();
+            ChecktWeatherForcast();
         }
     }
+
+    private void CheckWeatherForcast()
+    {
+        try
+        {
+            if(IsConnected())
+            {
+                GetWeatherDataTask task = new GetWeatherDataTask(_lat,_long);
+                task.execute().get();
+                txt_location.setText(task.wData);
+            }
+            hd_timer.postDelayed(checkWeatherTask,60000);
+        }catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+
+
     private com.google.android.gms.common.api.GoogleApiClient client;
 
-    private  void  CheckWeatherForcast()
-    {
+    private void ChecktWeatherForcast() {
         try {
-            Toast.makeText(MapsActivity.this, "Check ne", Toast.LENGTH_LONG).show();
-            hd_timer.postDelayed(checkWeatherTask,60000);
-//            http://api.openweathermap.org/data/2.5/weather?lat=35&lon=139&APPID=7dffb65f295bdf08864967f051bc533d
+            if(IsConnected())
+            {
+                GetWeatherDataTask gwdt = new GetWeatherDataTask(_lat, _long);
+                gwdt.execute().get();
+                switch (gwdt.wData)
+                {
+                    case "Clouds" :
+                        imageView.setImageResource(R.drawable.cloulds);
+                        break;
+
+                    case "Clear" :
+                        imageView.setImageResource(R.drawable.clear);
+                        break;
+                    case "Rain" :
+                        imageView.setImageResource(R.drawable.rain);
+                        break;
+                    case "Snow" :
+                        imageView.setImageResource(R.drawable.snow);
+                        break;
+                    case "Thunderstorm" :
+                        imageView.setImageResource(R.drawable.thunderstorm);
+                        break;
+                    default:
+                        imageView.setImageResource(R.drawable.clear);
+                        break;
+                }
+            }
+            hd_timer.postDelayed(checkWeatherTask, 60000);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -129,14 +177,20 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         try {
             client = new com.google.android.gms.common.api.GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
             init();
+            hd_timer = new Handler();
             checkWeatherTask = new CheckWeatherForcastRunable();
             hd_timer.removeCallbacks(checkWeatherTask);
-            hd_timer.postDelayed(checkWeatherTask,1000);
+            hd_timer.postDelayed(checkWeatherTask, 1000);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
+    private Marker currentlocation = null;
+
+
+    private  double _long = 106.7664525;
+    private  double _lat = 10.8864698;
 
     private void onMyMapReady(GoogleMap googleMap) {
 
@@ -175,18 +229,21 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                     // TODO Auto-generated method stub
                     try {
                         latLngGPS = new LatLng(arg0.getLatitude(), arg0.getLongitude());
-                        myMap.addMarker(new MarkerOptions().position(new LatLng(arg0.getLatitude(), arg0.getLongitude())).title("It's Me!"));
+                        if(currentlocation != null)
+                        {
+                            currentlocation.remove();
+                        }
+                        currentlocation = myMap.addMarker(new MarkerOptions().position(new LatLng(arg0.getLatitude(), arg0.getLongitude())).title("It's Me!").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
 
                         Geocoder gcd = new Geocoder(MapsActivity.this, Locale.getDefault());
                         if (latLngGPS != null) {
                             try {
                                 List<Address> addresses = geocoder.getFromLocation(arg0.getLatitude(), arg0.getLongitude(), 1);
                                 if (addresses.size() > 0) {
-                                    //Toast.makeText(MapsActivity.this, addresses.get(0).getLocality(), Toast.LENGTH_LONG).show();
-                                    txt_location.setText("Your location: " +  addresses.get(0).getLocality());
+                                    txt_location.setText(addresses.get(0).getLocality() ) ;
                                 } else {
-                                    //Toast.makeText(MapsActivity.this, "khong co location", Toast.LENGTH_LONG).show();
-                                    txt_location.setText("Your location: Unknown" );
+
+                                    txt_location.setText("Searching...");
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -412,6 +469,32 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     private void init() {
         txt_place = (AutoCompleteTextView) findViewById(R.id.txt_place);
         txt_location = (TextView) findViewById(R.id.txt_city);
+        imageView = (ImageView)findViewById(R.id.imageView);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (latLngGPS == null) {
+                    try {
+                        Toast.makeText(MapsActivity.this, "Please select your location first!", Toast.LENGTH_LONG).show();
+                    } catch (Exception ex) {
+                                          }
+                }
+                else
+                {
+                    try {
+                        Intent i = new Intent(getApplicationContext(),WheatherActivity.class);
+                        i.putExtra("LONG", latLngGPS.longitude);
+                        i.putExtra("LAT", latLngGPS.latitude);
+                        startActivity(i);
+
+                    }catch (Exception ex)
+                    {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        });
         txt_place.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -613,7 +696,6 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     private Polyline path = null;
 
     public void veduongdi() {
-        //Toast.makeText(MapsActivity.this, "nhan nut",Toast.LENGTH_SHORT).show();
         veduongdixml a = new veduongdixml();
         a.execute(latLng.latitude,
                 latLng.longitude,

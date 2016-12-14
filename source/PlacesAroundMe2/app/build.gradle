@@ -47,15 +47,19 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+    //androidannotation
+    //thu vien ve duong di
+
+
+
+    
+
+
     compile 'com.android.support:multidex:1.0.0'
     compile 'com.android.support:appcompat-v7:24.2.1'
-    compile 'com.google.android.gms:play-services:9.6.1'
-    testCompile 'junit:junit:4.12'
-    //androidannotation
-    apt "org.androidannotations:androidannotations:4.0.0"
-    compile 'org.androidannotations:androidannotations-api:4.0.0'
-    //thu vien ve duong di
-    compile 'com.google.android.gms:play-services:+'
-
-    compile 'org.apache.httpcomponents:httpclient:4.2.6'
-}
+    compile'com.google.android.gms:play-services:9.6.1'
+    compile'org.androidannotations:androidannotations-api:4.0.0'
+    compile'org.apache.httpcomponents:httpclient:4.2.6'
+    compile'com.android.support:support-v4:24.2.1'
+    testCompile'junit:junit:4.12'
+    apt'org.androidannotations:androidannotations:4.0.0'}
