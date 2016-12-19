@@ -68,6 +68,16 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true" />
+
+
+
+        <TextView
+            android:id="@+id/tv_distance_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:textColor="@color/common_google_signin_btn_text_light_pressed"
+            android:text="" />
     </RelativeLayout>
 
 </LinearLayout>
